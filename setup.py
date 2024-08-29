@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='GlobalFitting',
-    version='0.0.1',
+    version='0.0.2',
     author='Hikaru Nozawa',
     description='Global fitting of Gaussian mixture model',
     packages=find_packages(),
