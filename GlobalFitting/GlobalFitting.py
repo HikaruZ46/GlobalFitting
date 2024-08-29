@@ -20,8 +20,7 @@ def fit_global(data, n_components, n_datasets):
         sum_weights[i] = 1
     constraint = LinearConstraint(A_eq, sum_weights, sum_weights)
     result = minimize(objective, initial_params, args=(fixed_params), bounds=bounds, constraints=constraint)
-    print(result.jac)
-    return result.x
+    return result
 
 def objective(params, fixed_params):
     n_components = fixed_params[0]
@@ -71,11 +70,11 @@ if __name__ == '__main__':
     n_components = 2
     n_datasets = 2
     data = [data1, data2]
-    params = fit_global(data, n_components, n_datasets)
-    print_result(params, n_components, n_datasets)
-    means = params[:n_components]
-    stds = params[n_components:(n_datasets+1)*n_components]
-    weights = params[(n_datasets+1)*n_components:]
+    result = fit_global(data, n_components, n_datasets)
+    print_result(result.x, n_components, n_datasets)
+    means = result.x[:n_components]
+    stds = result.x[n_components:(n_datasets+1)*n_components]
+    weights = result.x[(n_datasets+1)*n_components:]
     x = np.linspace(min(data1), max(data1), 1000)
     for k in range(n_datasets):
         plt.hist(data[k], bins=50, alpha=0.5, density=True)
