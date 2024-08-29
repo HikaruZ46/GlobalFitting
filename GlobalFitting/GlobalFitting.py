@@ -64,6 +64,7 @@ def print_result(x, n_components, n_datasets):
 
 
 if __name__ == '__main__':
+    # sample data
     import matplotlib.pyplot as plt
     data1 = np.concatenate([np.random.normal(0, 1, 1000), np.random.normal(10, 1, 500)])
     data2 = np.concatenate([np.random.normal(0, 1, 500), np.random.normal(10, 1, 1000)])
