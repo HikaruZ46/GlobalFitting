@@ -1,1 +1,1 @@
-import GlobalFitting as gf
+from . import GlobalFitting as gf

@@ -6,19 +6,27 @@ def fit_global(data, n_components, n_datasets):
     fixed_params = [n_components, data]
     data_flatten = np.concatenate(data).flatten()
     initial_means = np.random.choice(data_flatten, n_components)
-    initial_stds = np.full(n_components*n_datasets, np.std(data))
+    initial_stds = np.full(n_components*n_datasets, np.std(data_flatten))
     initial_weights = np.full(n_components*n_datasets, 1/n_components)
     initial_params = np.concatenate([initial_means, initial_stds, initial_weights])
     # weights and stds should be positive
-    bounds = [(None, None)]*n_components + [(0, None)]*n_components*n_datasets + [(0, 1)]*n_components*n_datasets
+    bounds = [(np.min(data_flatten), np.max(data_flatten))]*n_components + [(1e-10, None)]*n_components*n_datasets + [(0, 1)]*n_components*n_datasets
     # add equality constraint for sum of weights
     # sum of weights should be 1
+    A_sum_weights = np.ones(n_datasets)
     A_eq = np.zeros((n_datasets, len(initial_params)))
-    sum_weights = np.zeros(n_datasets)
     for i in range(n_datasets):
         A_eq[i, (n_datasets+i+1)*n_components:(n_datasets+i+2)*n_components] = 1
-        sum_weights[i] = 1
-    constraint = LinearConstraint(A_eq, sum_weights, sum_weights)
+        A_sum_weights[i] = 1
+    # share stds and means
+    B_eq = np.zeros(((n_datasets-1)*n_components, len(initial_params)))
+    B_sum_weights = np.zeros((n_datasets-1)*n_components)
+    for i in range((n_datasets-1)*n_components):
+        B_eq[i, n_components+i] = 1
+        B_eq[i, 2*n_components+i] = -1
+    Constraint_eq = np.concatenate([A_eq, B_eq])
+    sum_weights = np.concatenate([A_sum_weights, B_sum_weights])
+    constraint = LinearConstraint(Constraint_eq, sum_weights, sum_weights)
     result = minimize(objective, initial_params, args=(fixed_params), bounds=bounds, constraints=constraint)
     return result
 
